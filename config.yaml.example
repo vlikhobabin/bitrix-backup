@@ -1,0 +1,228 @@
+# Конфигурация системы резервного копирования Bitrix24
+# ===================================================
+# ИНСТРУКЦИЯ:
+# 1. Скопируйте этот файл: cp config.yaml.example config.yaml
+# 2. Отредактируйте config.yaml под ваши параметры
+# 3. НЕ коммитьте config.yaml в Git!
+
+# Пути и директории
+BACKUP_DIR: "/backup/daily"           # Директория для хранения backup'ов
+TEMP_DIR: "/backup/temp"              # Временная директория
+BITRIX_ROOT: "/home/bitrix/www"       # Корневая директория Bitrix24
+
+# База данных
+DB_NAME: "sitemanager"                # Имя базы данных
+MYSQL_CONFIG: "/root/.my.cnf"         # Путь к файлу конфигурации MySQL (.my.cnf)
+
+# Общие настройки
+MAX_BACKUPS: 5                        # Максимальное количество backup'ов для хранения
+MIN_DISK_SPACE_KB: 5000000           # Минимальное свободное место на диске (KB) = 5GB
+
+# Настройки хранения backup'ов
+STORAGE_TYPE: "local"                 # Тип хранилища: "local" или "s3"
+
+# S3-совместимое хранилище (настройки активны при STORAGE_TYPE: "s3")
+S3_CONFIG:
+  endpoint_url: "https://s3.amazonaws.com"          # URL S3-совместимого хранилища
+  bucket_name: "your-backup-bucket"                 # Имя бакета для backup'ов
+  access_key: "YOUR_ACCESS_KEY_HERE"                # Access Key ID
+  secret_key: "YOUR_SECRET_KEY_HERE"                # Secret Access Key
+  backup_path: "daily-bitrix-backups"               # Папка в S3 (без слешей в начале/конце)
+  max_backups: 5                                    # Количество backup'ов в S3
+  delete_local_after_upload: false                  # Удалять локальный файл после загрузки
+
+# Настройки логирования
+LOG_DIR: "/backup/logs"               # Директория для файлов логов
+LOG_MAX_SIZE_MB: 10                   # Максимальный размер одного лог-файла (MB)
+LOG_BACKUP_COUNT: 5                   # Количество архивных лог-файлов для хранения
+LOG_LEVEL: "INFO"                     # Уровень логирования: DEBUG, INFO, WARNING, ERROR
+
+# Email уведомления
+EMAIL_ENABLED: true                   # Включить/выключить уведомления
+EMAIL_TO: "admin@your-domain.com"    # Email получателя уведомлений
+EMAIL_FROM: "backup@your-domain.com" # Email отправителя
+
+# SMTP настройки (опционально, если не настроено - используется PHP mail())
+SMTP_CONFIG:
+  server: "smtp.your-provider.com"    # SMTP сервер
+  port: 587                           # SMTP порт (587 для TLS, 465 для SSL)
+  username: "your-email@domain.com"   # SMTP пользователь
+  password: "your_smtp_password"      # SMTP пароль
+  use_tls: true                       # Использовать TLS/SSL
+
+# Системные конфигурации для включения в backup
+SYSTEM_CONFIGS:
+  - "/etc/nginx"                      # Конфигурация Nginx
+  - "/etc/httpd"                      # Конфигурация Apache
+  - "/etc/php.ini"                    # Настройки PHP
+  - "/etc/my.cnf"                     # Конфигурация MySQL
+  - "/etc/msmtprc"                    # Настройки SMTP
+  - "/home/bitrix/.msmtprc"           # Пользовательские настройки SMTP
+  - "/etc/push-server"                # Push-server
+  - "/etc/sysconfig/push-server-multi"
+  - "/etc/ssl/certs/localhost.crt"    # SSL сертификат
+  - "/etc/ssl/private/localhost.key"  # SSL ключ
+  - "/root/.my.cnf"
+
+# Исключения из backup'а файлов (только файлы, которые регенерируются автоматически)
+# ВАЖНО: исключаем только то, что НЕ влияет на работоспособность после восстановления
+EXCLUDE_PATTERNS:
+  # === КЭШ ФАЙЛЫ (регенерируются автоматически) ===
+  - "bitrix/cache/"                   # Кэш Bitrix
+  - "bitrix/managed_cache/"           # Управляемый кэш  
+  - "bitrix/stack_cache/"             # Stack кэш
+  - "bitrix/html_pages/"              # Статический кэш страниц
+  - "local/cache/"                    # Локальный кэш
+  - "local/managed_cache/"            # Локальный управляемый кэш
+  - "local/stack_cache/"              # Локальный stack кэш
+  - "upload/resize_cache/"            # Кэш миниатюр изображений
+  
+  # === ВРЕМЕННЫЕ ФАЙЛЫ ===
+  - "bitrix/tmp/"                     # Временные файлы Bitrix
+  - "upload/tmp/"                     # Временные загрузки
+  - "local/tmp/"                      # Локальные временные файлы
+  - "local/temp/"                     # Локальные временные файлы
+  - "*.tmp"                           # Временные файлы
+  - "*.temp"                          # Временные файлы
+  - "*.bak"                           # Backup файлы
+  - "*.backup"                        # Backup файлы  
+  - "*.old"                           # Старые файлы
+  
+  # === ЛОГ ФАЙЛЫ ===
+  - "*.log"                           # Лог файлы
+  - "local/logs/"                     # Директория логов
+  
+  # === ФАЙЛЫ ОБНОВЛЕНИЙ (скачиваются заново) ===
+  - "bitrix/updates/"                 # Файлы обновлений Bitrix
+  - "bitrix/backup/"                  # Старые backup'ы Bitrix
+  
+  # === СИСТЕМНЫЕ ФАЙЛЫ ОС ===
+  - ".DS_Store"                       # macOS
+  - "Thumbs.db"                       # Windows
+  - "Desktop.ini"                     # Windows
+  - ".fuse_hidden*"                   # Linux
+  - ".Trash-*"                        # Linux
+  
+  # === IDE И РЕДАКТОРЫ ===
+  - ".idea/"                          # PhpStorm/IntelliJ
+  - ".vscode/"                        # Visual Studio Code
+  - "*.sublime-*"                     # Sublime Text
+  - "*.swp"                           # Vim
+  - "*.swo"                           # Vim
+  
+  # === АРХИВЫ ===
+  - "*.zip"                           # Архивы
+  - "*.rar"                           # Архивы
+  - "*.7z"                            # Архивы
+  - "*.tar"                           # Архивы
+  - "*.tar.gz"                        # Архивы
+  - "*.gz"                            # Архивы
+  
+  # === ИНСТРУМЕНТЫ РАЗРАБОТКИ ===
+  - "vendor/"                         # Composer пакеты
+  - "node_modules/"                   # Node.js пакеты
+  - ".sass-cache/"                    # Sass кэш
+  - "dist/"                           # Сборки
+  - "build/"                          # Сборки
+  
+  # === GIT РЕПОЗИТОРИЙ (экономия ~1.2GB) ===
+  - ".git/"                           # Git репозиторий (история, объекты, индекс)
+  - ".gitignore"                      # Git конфигурация
+  - ".gitattributes"                  # Git атрибуты
+  
+  # === SOURCE MAPS И ФАЙЛЫ РАЗРАБОТКИ (экономия ~15-20MB) ===
+  - "*.js.map"                        # JavaScript source maps
+  - "*.css.map"                       # CSS source maps
+  - "*.min.js.map"                    # Minified JS source maps
+  - "*.min.css.map"                   # Minified CSS source maps
+  
+  # ПРИМЕЧАНИЕ: НЕ исключаем важные файлы:
+  # - .htaccess, web.config (конфигурация веб-сервера)
+  # - .settings.php (настройки БД) 
+  # - license_key.php (лицензия)
+  # - urlrewrite.php (правила URL)
+  # - sitemap*.xml, robots.txt (SEO)
+  # - Все PHP файлы (включая test*.php, debug*.php)
+  # - Содержимое /upload/ (кроме tmp и resize_cache)
+
+# ==========================================
+# ПРИМЕРЫ НАСТРОЕК ДЛЯ РАЗНЫХ ПРОВАЙДЕРОВ
+# ==========================================
+
+# === AWS S3 ===
+# S3_CONFIG:
+#   endpoint_url: "https://s3.amazonaws.com"
+#   bucket_name: "your-aws-bucket"
+#   access_key: "AKIA..."
+#   secret_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+
+# === Yandex Object Storage ===
+# S3_CONFIG:
+#   endpoint_url: "https://storage.yandexcloud.net"
+#   bucket_name: "your-bucket"
+#   access_key: "YCAJEk..."
+#   secret_key: "YCM6T..."
+
+# === DigitalOcean Spaces ===
+# S3_CONFIG:
+#   endpoint_url: "https://fra1.digitaloceanspaces.com"
+#   bucket_name: "your-space-name"
+#   access_key: "DO00..."
+#   secret_key: "your_secret_key"
+
+# === VK Cloud (Mail.ru) ===
+# S3_CONFIG:
+#   endpoint_url: "https://hb.ru-msk.vkcs.cloud"
+#   bucket_name: "your-bucket"
+#   access_key: "your_access_key"
+#   secret_key: "your_secret_key"
+
+# === Selectel ===
+# S3_CONFIG:
+#   endpoint_url: "https://s3.selcdn.ru"
+#   bucket_name: "your-container"
+#   access_key: "your_access_key"
+#   secret_key: "your_secret_key"
+
+# ==========================================
+# НАСТРОЙКА ПУТЕЙ S3
+# ==========================================
+
+# backup_path - имя папки в S3 бакете для хранения backup'ов
+# Примеры различных путей:
+# backup_path: "daily-bitrix-backups"        # Простая папка
+# backup_path: "backups"                     # Короткое имя
+# backup_path: "production/bitrix"           # С подпапкой
+# backup_path: "server1-backups"             # С именем сервера
+# backup_path: "2025/bitrix24"               # С годом
+
+# ВАЖНО: НЕ используйте слеши в начале и конце!
+# Правильно: "daily-bitrix-backups"
+# Неправильно: "/daily-bitrix-backups/" или "/daily-bitrix-backups"
+
+# ==========================================
+# SMTP ПРИМЕРЫ
+# ==========================================
+# Gmail:
+# SMTP_CONFIG:
+#   server: "smtp.gmail.com"
+#   port: 587
+#   username: "your-email@gmail.com"
+#   password: "your_app_password_here"
+#   use_tls: true
+
+# Yandex:
+# SMTP_CONFIG:
+#   server: "smtp.yandex.ru"
+#   port: 465
+#   username: "your-email@yandex.ru"
+#   password: "your_password_here"
+#   use_tls: true
+
+# Mail.ru:
+# SMTP_CONFIG:
+#   server: "smtp.mail.ru"
+#   port: 465
+#   username: "your-email@mail.ru"
+#   password: "your_password_here"
+#   use_tls: true

@@ -1,0 +1,61 @@
+# Bitrix24 Backup System - .gitignore
+# =====================================
+
+old/
+logs/
+
+# Виртуальная среда Python
+.venv/
+venv/
+env/
+ENV/
+
+# Файлы Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Временные и backup файлы
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*~
+
+# Директории backup'ов (создаются скриптом)
+daily/
+temp/
+*.tar.gz
+
+# Логи
+*.log
+
+# IDE файлы
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Конфиденциальные файлы (НЕ коммитить!)
+config.yaml          
+.my.cnf              
+
+# Архивы
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Тестовые файлы
+test_*.py
+*_test.py
+

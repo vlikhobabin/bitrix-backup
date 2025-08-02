@@ -1,0 +1,37 @@
+# Bitrix24 Backup System - Python Dependencies
+# ===============================================
+
+# ИНСТРУКЦИИ ПО ВИРТУАЛЬНОЙ СРЕДЕ:
+# 1. Создание: python3 -m venv .venv
+# 2. Активация: source .venv/bin/activate  (или ./activate.sh)
+# 3. Установка: pip install -r requirements.txt
+# 4. Деактивация: deactivate
+
+# ОБЯЗАТЕЛЬНЫЕ ЗАВИСИМОСТИ:
+PyYAML>=6.0
+
+# ===============================================
+# ДОПОЛНИТЕЛЬНЫЕ ПАКЕТЫ (опционально)
+# Раскомментируйте нужные и переустановите:
+# pip install -r requirements.txt --upgrade
+# ===============================================
+
+# Для работы с MySQL через Python (альтернатива mysqldump)
+# mysql-connector-python==8.2.0
+
+# Для отправки уведомлений в Telegram
+# python-telegram-bot==20.7
+
+# Для криптографии backup'ов  
+# cryptography==41.0.8
+
+# Для работы с облачными хранилищами
+boto3==1.35.36  # AWS S3 и S3-совместимые хранилища
+# google-cloud-storage==2.12.0  # Google Cloud Storage
+
+# Для мониторинга системы
+# psutil==5.9.6
+
+# Примечание:
+# Скрипт использует в основном встроенные модули Python 3.6+
+# и внешние утилиты системы (mysqldump, tar, hostname и т.д.)

@@ -1,0 +1,19 @@
+# Пример конфигурационного файла MySQL для Bitrix24 Backup
+# Скопируйте этот файл в /root/.my.cnf и настройте под ваши параметры
+
+[client]
+user=root
+password=your_mysql_password_here
+socket=/var/lib/mysqld/mysqld.sock
+
+# Альтернативный вариант для TCP подключения:
+# user=bitrix0
+# password=your_mysql_password_here  
+# host=localhost
+# port=3306
+
+# ВАЖНО:
+# 1. Измените пароль на актуальный из вашего /root/.my.cnf
+# 2. Скопируйте файл: sudo cp my.cnf.example /root/.my.cnf
+# 3. Установите права: sudo chmod 600 /root/.my.cnf
+# 4. Установите владельца: sudo chown root:root /root/.my.cnf
